@@ -14,16 +14,28 @@ class UsersController extends BaseController
 
     public function index()
     {
+        if (session()->get('isLogged')) {
+            return redirect('dashboard');
+        }
+
         return view('homepage');
     }
 
     public function login()
     {
+        if (session()->get('isLogged')) {
+            return redirect('dashboard');
+        }
+
         return view('auth/login');
     }
 
     public function register()
     {
+        if (session()->get('isLogged')) {
+            return redirect('dashboard');
+        }
+
         return view('auth/registration');
     }
 
@@ -92,7 +104,7 @@ class UsersController extends BaseController
         ]);
 
         if (!$validation) {
-            return view('auth/registration', ['validation' => $this->validator]);
+            return redirect()->back()->withInput();
         }
 
         // Save data into db.
@@ -161,14 +173,14 @@ class UsersController extends BaseController
         $userinfo = $user_model->where('email', $email)->first();
         $checkpassword = Hash::check($password, $userinfo['password']);
 
-        if(!$checkpassword){
+        if (!$checkpassword) {
             session()->setFlashdata('fail', 'Incorrect Password.');
             return redirect()->to('login')->withInput();
         }
 
         $userid = $userinfo['id'];
         session()->set('loggedInUser', $userid);
+        session()->set('isLogged', true);
         return redirect()->to('/dashboard');
-
     }
 }

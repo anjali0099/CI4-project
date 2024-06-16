@@ -9,6 +9,16 @@
                 </h3>
             </div>
             <div class="card-body">
+                <?php $errors = validation_errors(); ?>
+                <?php if (!empty($errors)) : ?>
+                    <div class="alert alert-danger" role="alert">
+                        <ul>
+                            <?php foreach ($errors as $error) : ?>
+                                <li><?= esc($error) ?></li>
+                            <?php endforeach ?>
+                        </ul>
+                    </div>
+                <?php endif ?>
                 <form method="POST" action="<?= base_url('store-users') ?>">
                     <?= csrf_field() ?>
                     <?php if (!empty(session()->getFlashdata('fail'))) : ?>
@@ -18,7 +28,6 @@
                         <div class="col">
                             <label for="first_name" class="form-label">First Name</label>
                             <input type="text" class="form-control" id="first_name" name="first_name" value="<?= set_value('first_name'); ?>">
-                            <span class="text-danger"><?= isset($validation) ? display_error($validation, 'first_name') : '' ?></span>
                         </div>
                         <div class="col">
                             <label for="last_name" class="form-label">Last Name</label>

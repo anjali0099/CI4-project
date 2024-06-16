@@ -10,6 +10,10 @@ class DashboardController extends BaseController
 {
     public function index()
     {
+        if (session()->get('isLogged') === 0) {
+            return redirect('login');
+        }
+
         $usermodel = new UsersModel();
         $loggedInUser = session()->get('loggedInUser');
         $userinfo = $usermodel->find($loggedInUser);
@@ -25,6 +29,10 @@ class DashboardController extends BaseController
      */
     public function add()
     {
+        if (session()->get('isLogged') === 0) {
+            return redirect('login');
+        }
+
         if (!$this->request->is('post')) {
             return view('task/index');
         }
