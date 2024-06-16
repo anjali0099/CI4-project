@@ -20,13 +20,14 @@
                     <a class="nav-link active" aria-current="page" href="<?= site_url('/') ?>">Home</a>
                 </div>
                 <div class="navbar-nav">
-                    <a class="nav-link" aria-current="page" href="<?= site_url('login') ?>">Login</a>
-                </div>
-                <div class="navbar-nav">
-                    <a class="nav-link" aria-current="page" href="<?= site_url('register') ?>">Register</a>
+                    <?php if (session()->get('isLogged')) : ?>
+                        <a class="nav-link" aria-current="page" href="<?= site_url('logout') ?>">Logout</a>
+                    <?php else : ?>
+                        <a class="nav-link" aria-current="page" href="<?= site_url('login') ?>">Login</a>
+                        <a class="nav-link" aria-current="page" href="<?= site_url('register') ?>">Register</a>
+                    <?php endif ?>
                 </div>
             </div>
-        </div>
     </nav>
     <div class="container">
         <?= $this->renderSection('content') ?>

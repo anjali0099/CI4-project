@@ -8,6 +8,11 @@ use App\Models\UsersModel;
 
 class DashboardController extends BaseController
 {
+    public function __construct()
+    {
+        helper(['url', 'form']);
+    }
+
     public function index()
     {
         if (session()->get('isLogged') === 0) {
@@ -17,11 +22,29 @@ class DashboardController extends BaseController
         $usermodel = new UsersModel();
         $loggedInUser = session()->get('loggedInUser');
         $userinfo = $usermodel->find($loggedInUser);
+
+        $taskmodel = new TasksModel();
+        $tasks = $taskmodel->where('users_id', $loggedInUser)->findAll();
+
         $data = [
             'userinfo' => $userinfo,
+            'tasks' => $tasks
         ];
 
         return view('task/index', $data);
+    }
+
+    public function create_task()
+    {
+        if (session()->get('isLogged') === 0) {
+            return redirect('login');
+        }
+
+        $data = [
+            'user_id' => session()->get('loggedInUser'),
+        ];
+
+        return view('task/create', $data);
     }
 
     /**
@@ -34,7 +57,7 @@ class DashboardController extends BaseController
         }
 
         if (!$this->request->is('post')) {
-            return view('task/index');
+            return view('task/create');
         }
 
         $validation = $this->validate([
@@ -47,7 +70,7 @@ class DashboardController extends BaseController
         ]);
 
         if (!$validation) {
-            return view('task/index', ['validation' => $this->validator]);
+            return view('task/create', ['validation' => $this->validator]);
         }
 
         // Save data into db.
@@ -69,5 +92,67 @@ class DashboardController extends BaseController
         }
 
         return redirect()->to('dashboard')->with('success', 'Task added successfully');
+    }
+
+    /**
+     * Edit Task
+     *
+     * @param $id Task id
+     */
+    public function edit($id)
+    {
+        if (session()->get('isLogged') === 0) {
+            return redirect('login');
+        }
+
+        $taskmodel = new TasksModel();
+        $task = $taskmodel->find($id);
+
+        $data = [
+            'task' => $task
+        ];
+
+        return view('task/edit', $data);
+    }
+
+    /**
+     * Update Task
+     *
+     * @param $id Task id
+     */
+    public function update($id)
+    {
+        $taskmodel = new TasksModel();
+
+        $updatedata = [
+            'title' => $this->request->getPost('title'),
+            'description' => $this->request->getPost('description'),
+            'users_id' => $this->request->getPost('users_id'),
+        ];
+
+        $update = $taskmodel->update($id, $updatedata);
+
+        if ($update) {
+            return redirect()->to('dashboard')->with('success', 'Task updated successfully');
+        } else {
+            return redirect()->to('task/edit')->with('fail', 'Something went wrong');
+        }
+    }
+
+    /**
+     * Delete Task
+     *
+     * @param $id Task id
+     */
+    public function delete($id)
+    {
+        $taskmodel = new TasksModel();
+        $delete = $taskmodel->where('id', $id)->delete();
+
+        if ($delete) {
+            return redirect()->back()->with('success', 'Task deleted successfully.');
+        } else {
+            return redirect()->back()->with('fail', 'Something went wrong');;
+        }
     }
 }

@@ -9,7 +9,7 @@
                 </h3>
             </div>
             <div class="card-body">
-                <form method="POST" action="<?= base_url('loginuser') ?>">
+                <form method="POST" action="<?= base_url('login') ?>">
                     <?php if (!empty(session()->getFlashdata('fail'))) : ?>
                         <div class="alert alert-danger"><?= session()->getFlashdata('fail'); ?></div>
                     <?php endif ?>

@@ -104,7 +104,7 @@ class UsersController extends BaseController
         ]);
 
         if (!$validation) {
-            return redirect()->back()->withInput();
+            return view('auth/registration', ['validation' => $this->validator]);
         }
 
         // Save data into db.
@@ -182,5 +182,19 @@ class UsersController extends BaseController
         session()->set('loggedInUser', $userid);
         session()->set('isLogged', true);
         return redirect()->to('/dashboard');
+    }
+
+    /**
+     * Logout user
+     */
+    public function logout()
+    {
+        // Load session library
+        $session = session();
+
+        // Destroy the session
+        $session->destroy();
+
+        return redirect()->to(site_url('/'));
     }
 }
